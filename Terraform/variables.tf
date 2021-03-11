@@ -65,6 +65,6 @@ variable "port_list" {
   default = [
     22,
     80,
-    8080,
+    443,
   ]
 }

@@ -1,0 +1,145 @@
+---
+- hosts: MAHARA
+  tasks:
+  - name: apt-update
+    become: yes
+    become_method: sudo
+    shell: "apt-get update"
+
+  - name: Install apache2
+    become: yes
+    become_method: sudo
+    apt: name=apache2 state=latest
+
+  - name: Install php
+    become: yes
+    become_method: sudo    
+    apt: name=php state=latest
+
+  - name: Install php-mysql
+    become: yes
+    become_method: sudo    
+    apt: name=php-mysql state=latest
+
+  - name: Install php-mbstring
+    become: yes
+    become_method: sudo    
+    apt: name=php-mbstring state=latest
+
+  - name: Install php-intl
+    become: yes
+    become_method: sudo    
+    apt: name=php-intl state=latest
+
+  - name: Install php-soap
+    become: yes
+    become_method: sudo    
+    apt: name=php-soap state=latest
+
+  - name: Install php-xml
+    become: yes
+    become_method: sudo    
+    apt: name=php-xml state=latest
+
+  - name: Install php-xmlrpc
+    become: yes
+    become_method: sudo    
+    apt: name=php-xmlrpc state=latest
+
+  - name: Install php-curl
+    become: yes
+    become_method: sudo    
+    apt: name=php-curl state=latest
+
+  - name: Install php-gd
+    become: yes
+    become_method: sudo    
+    apt: name=php-gd state=latest
+
+  - name: Install mysql
+    become: yes
+    become_method: sudo    
+    apt: name=mysql-server state=latest
+
+  - name: Copy script
+    become: yes
+    become_method: sudo    
+    copy: src=script.sql dest=/tmp
+
+  - name: Run Mysql Script
+    become: yes
+    become_method: sudo
+    shell: "mysql </tmp/script.sql"
+
+  - name: Download Mahara
+    become: yes
+    become_method: sudo    
+    get_url:
+      url: https://launchpad.net/mahara/20.10/20.10.0/+download/mahara-20.10.0.tar.gz
+      dest: /tmp/
+
+  - name: Unarchive Mahara
+    ansible.builtin.unarchive:
+      src: /tmp/mahara-20.10.0.tar.gz
+      dest: /tmp/
+      remote_src: yes
+
+  - name: Copy to apache
+    become: yes
+    become_method: sudo
+    shell: "cp -r /tmp/mahara-20.10.0 /var/www"
+
+  - name: Create dataroot
+    become: yes
+    become_method: sudo
+    shell: "mkdir /var/maharadata"    
+
+  - name: Chown dataroot
+    become: yes
+    become_method: sudo
+    shell: "chown -R www-data:www-data /var/maharadata"
+  
+  - name: Copy php.ini to /tmp
+    become: yes
+    become_method: sudo
+    copy: src=php.ini dest=/tmp
+
+  - name: Copy php.ini
+    become: yes
+    become_method: sudo
+    shell: "cp /tmp/php.ini /etc/php/7.4/apache2/"
+
+  - name: Copy config.php
+    become: yes
+    become_method: sudo
+    copy: src=config.php dest=/var/www/mahara-20.10.0
+
+  - name: copy crt
+    become: yes
+    become_method: sudo
+    copy: src=compute-1.amazonaws.com.crt dest=/etc/ssl/certs
+
+  - name: copy key
+    become: yes
+    become_method: sudo
+    copy: src=compute-1.amazonaws.com.key dest=/etc/ssl/private
+
+  - name: copy default-ssl.conf
+    become: yes
+    become_method: sudo
+    copy: src=default-ssl.conf dest=/etc/apache2/sites-available
+
+  - name: ssl
+    become: yes
+    become_method: sudo
+    shell: "a2enmod ssl"
+
+  - name: a2ensite default
+    become: yes
+    become_method: sudo
+    shell: "a2ensite default-ssl.conf"
+
+  - name: Restart Apache2
+    become: yes
+    become_method: sudo
+    shell: "systemctl restart apache2"
