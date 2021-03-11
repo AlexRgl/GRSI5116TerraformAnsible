@@ -32,7 +32,7 @@ $cfg = new stdClass();
  * database connection details
  * valid values for dbtype are 'postgres' and 'mysql'
  */
-$cfg->dbtype   = 'mysql';
+$cfg->dbtype   = 'postgres';
 $cfg->dbhost   = 'localhost';
 $cfg->dbport   = null; // Change if you are using a non-standard port number for your database
 $cfg->dbname   = 'maharadb';

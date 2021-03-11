@@ -11,65 +11,61 @@
     become_method: sudo
     apt: name=apache2 state=latest
 
+  - name: Install postgresql
+    become: yes
+    become_method: sudo    
+    apt: name=postgresql state=latest
+
+  - name: Install postgresql-contrib
+    become: yes
+    become_method: sudo    
+    apt: name=postgresql-contrib state=latest
+
   - name: Install php
     become: yes
     become_method: sudo    
     apt: name=php state=latest
-
-  - name: Install php-mysql
-    become: yes
-    become_method: sudo    
-    apt: name=php-mysql state=latest
-
-  - name: Install php-mbstring
-    become: yes
-    become_method: sudo    
-    apt: name=php-mbstring state=latest
-
-  - name: Install php-intl
-    become: yes
-    become_method: sudo    
-    apt: name=php-intl state=latest
-
-  - name: Install php-soap
-    become: yes
-    become_method: sudo    
-    apt: name=php-soap state=latest
-
-  - name: Install php-xml
-    become: yes
-    become_method: sudo    
-    apt: name=php-xml state=latest
-
-  - name: Install php-xmlrpc
-    become: yes
-    become_method: sudo    
-    apt: name=php-xmlrpc state=latest
-
-  - name: Install php-curl
-    become: yes
-    become_method: sudo    
-    apt: name=php-curl state=latest
 
   - name: Install php-gd
     become: yes
     become_method: sudo    
     apt: name=php-gd state=latest
 
-  - name: Install mysql
+  - name: Install php-pgsql
     become: yes
     become_method: sudo    
-    apt: name=mysql-server state=latest
+    apt: name=php-pgsql state=latest
 
-  - name: Copy script
+  - name: Install php-xmlrpc
     become: yes
     become_method: sudo    
-    copy: src=script.sql dest=/tmp
+    apt: name=php-xmlrpc state=latest
 
-  - name: Run Mysql Script
+  - name: Install php-xml
+    become: yes
+    become_method: sudo    
+    apt: name=php-xml state=latest
+
+  - name: Install php-mbstring
+    become: yes
+    become_method: sudo    
+    apt: name=php-mbstring state=latest
+
+  - name: Install php-curl
+    become: yes
+    become_method: sudo    
+    apt: name=php-curl state=latest
+
+  - name: Copy Script
     become: yes
     become_method: sudo
-    shell: "mysql </tmp/script.sql"
+    copy: src=test.sql dest=/tmp/
+
+  - name: Create mahara
+    become: yes
+    become_method: sudo  
+    become_user: postgres
+    shell: "psql </tmp/test.sql"
 
   - name: Download Mahara
     become: yes
@@ -112,24 +108,24 @@
   - name: Copy config.php
     become: yes
     become_method: sudo
-    copy: src=config.php dest=/var/www/mahara-20.10.0
+    copy: src=config.php dest=/var/www/mahara-20.10.0/htdocs
 
-  - name: copy crt
+  - name: Copy crt
     become: yes
     become_method: sudo
     copy: src=compute-1.amazonaws.com.crt dest=/etc/ssl/certs
 
-  - name: copy key
+  - name: Copy key
     become: yes
     become_method: sudo
     copy: src=compute-1.amazonaws.com.key dest=/etc/ssl/private
 
-  - name: copy default-ssl.conf
+  - name: Copy default-ssl.conf
     become: yes
     become_method: sudo
     copy: src=default-ssl.conf dest=/etc/apache2/sites-available
 
-  - name: ssl
+  - name: Enable ssl
     become: yes
     become_method: sudo
     shell: "a2enmod ssl"
